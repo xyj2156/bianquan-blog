@@ -59,8 +59,6 @@
 
   //import markdownEditor from 'vue-simplemde/src/markdown-editor';
   import { mapState,mapActions,mapMutations } from 'vuex';
-import index from 'vue';
-
 
   export default {
       data(){

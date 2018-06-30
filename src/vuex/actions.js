@@ -2,14 +2,20 @@ import axios from 'axios'
 import router from '../routes.js'
 const common = require('./common');
 
-const _axios= params => {
-  return axios({
-      method: "post",
-      url: 'http://localhost:80/bianquan/servers/public/index.php/index',
-      // url: state.URL,
-      data: params
-    })
-}
+// ---------------------------------------------------------------------------------
+// 这里是以前的老方法。
+// const _axios= params => {
+//   return axios({
+//       method: "post",
+//       url: 'http://localhost:80/bianquan/servers/public/index.php/index',
+//       // url: state.URL,
+//       data: params
+//     })
+// };
+
+// ---------------------------------------------------------------------------------
+// 这里是我自己搞的兼容方法 放置在公共 common.js 中
+const _axios = common._ax;
 
 
 

@@ -76,7 +76,7 @@ const state = {
       content: [],
       imgs: []
     },
-     URL: 'http://localhost:80/bianquan/servers/public/index.php/index'
-  }
+     URL: 'http://b.com'
+  };
   
   export default state
