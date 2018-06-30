@@ -64,10 +64,15 @@ $di->setShared('view', function () {
     return $view;
 });
 
+// 调试用 注册服务 记录 sql 语句
+$di->set('profiler', function(){
+    return new\Phalcon\Db\Profiler();
+}, true);
+
 /**
  * Database connection is created based in the parameters defined in the configuration file
  */
-$di->setShared('db', function () {
+$di->setShared('db', function () use($di) {
     $config = $this->getConfig();
 
     $class = 'Phalcon\Db\Adapter\Pdo\\' . $config->database->adapter;
@@ -84,7 +89,26 @@ $di->setShared('db', function () {
     }
 
     $connection = new $class($params);
-
+//---------------------------------------------------------------------
+//    调试用
+    //新建一个事件管理器
+    $eventsManager = new \Phalcon\Events\Manager();
+    //从di中获取共享的profiler实例
+    $profiler = $di->getProfiler();
+    //监听所有的db事件
+    $eventsManager->attach('db', function($event, $connection) use ($profiler) {
+        //一条语句查询之前事件，profiler开始记录sql语句
+        if ($event->getType() == 'beforeQuery') {
+            $profiler->startProfile($connection->getSQLStatement());
+        }
+        //一条语句查询结束，结束本次记录，记录结果会保存在profiler对象中
+        if ($event->getType() == 'afterQuery') {
+            $profiler->stopProfile();
+        }
+    });
+    //将事件管理器绑定到db实例中
+    $connection->setEventsManager($eventsManager);
+//---------------------------------------------------------------------
     return $connection;
 });
 
