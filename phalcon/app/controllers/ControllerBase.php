@@ -46,4 +46,21 @@ class ControllerBase extends Controller
         }
         return $arr;
     }
+
+    /**
+     * 转接 去掉方法的Action
+     * @param $name
+     * @param $arg
+     * @return $this
+     */
+    public function __call ($name, $arg)
+    {
+        if(false !== strpos($name, 'Action')){
+            $name = substr($name, 0, -6);
+            if(method_exists($this, $name)){
+                return $this -> $name (... $arg);
+            }
+        }
+        return $this;
+    }
 }

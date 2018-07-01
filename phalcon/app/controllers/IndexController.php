@@ -18,6 +18,8 @@ class IndexController extends ControllerBase
             'searchfor' => '/article/search',
             'getPageCount' => '/article/getPageCount',
             'getPage' => '/article/getPage',
+            'getComment' => '/comment/getComment',
+            'getOne' => '/article/getOne',
         ]);
         return $this -> responseJson(10000, $data);
     }

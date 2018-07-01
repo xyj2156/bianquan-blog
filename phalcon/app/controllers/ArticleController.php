@@ -59,4 +59,20 @@ class ArticleController extends ControllerBase
         $data = Article::find($condtions);
         return $this -> responseJson(10007, $data);
     }
+
+    public function getOneAction()
+    {
+        $json = $this -> request -> getJsonRawBody(true);
+        if(empty($json) || empty($json['id'])){
+            return $this -> responseJson(10009, null);
+        }
+        $id = $json['id'];
+        $data = Article::findFirst([
+            'conditions' => 'a_id=:id: AND a_published=1',
+            'bind' => [
+                'id' => $id,
+            ],
+        ]);
+        return $this -> responseJson(10010, $data);
+    }
 }
