@@ -9,6 +9,9 @@
 namespace App\Model;
 
 use Phalcon\Mvc\Model;
+use Phalcon\Mvc\Model\{
+    Exception as ModelError
+};
 
 class ModelBase extends Model
 {
@@ -42,5 +45,34 @@ class ModelBase extends Model
         }catch (\Error | \Exception $error){
             return static::query() -> $method(...$arguments);
         }
+    }
+
+    /**
+     * @param $field
+     * @param string $id
+     * @return mixed | bool
+     * todo 静态调用 测试通过 测试对象中调用的问题
+     */
+    static public function setInc ($field, $id = 0)
+    {
+        if(!is_numeric($id)){
+            return static::_setInc($field);
+        }
+        $tmpObj = static::findFirst($id);
+        if(isset($tmpObj -> $field)){
+            $tmpObj -> $field += 1;
+            return $tmpObj -> update();
+        }
+        return false;
+    }
+
+//    todo 测试 写自增函数 添加到所有 继承这个模型的 calss 没有测试
+    protected function _setInc($field)
+    {
+        if(isset($this -> $field)){
+            $this -> $field += 1;
+            return $this -> update();
+        }
+        return false;
     }
 }

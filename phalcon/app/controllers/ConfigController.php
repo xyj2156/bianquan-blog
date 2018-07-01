@@ -15,4 +15,7 @@ class ConfigController extends ControllerBase
         $data = (WebData::find()) -> toArray();
         return $this -> responseJson(10001, $data);
     }
+
+    public function get_about()
+    {}
 }

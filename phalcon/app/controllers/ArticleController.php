@@ -10,45 +10,47 @@ namespace App\Controller;
 
 
 use App\Model\Article;
+use App\Model\WebData;
 
 class ArticleController extends ControllerBase
 {
     protected $pageSize = 6;
+
     public function searchAction()
     {
-        $key = $this -> request -> getJsonRawBody(true) ['key'];
-        if(!$key) {
-            return $this -> responseJson(10005, null, ['', '传过来的值为空']);
+        $key = $this->request->getJsonRawBody(true) ['key'];
+        if (!$key) {
+            return $this->responseJson(10005, null, ['', '传过来的值为空']);
         }
 
-        return $this -> responseJson(10004, ['key' => $key]);
+        return $this->responseJson(10004, ['key' => $key]);
     }
 
     public function getPageCountAction()
     {
-        $tag = $this -> request -> getJsonRawBody(true) ['tag'];
+        $tag = $this->request->getJsonRawBody(true) ['tag'];
         $where = 'a_published=1';
-        if($tag){
-            $where .= " AND a_tag=$tag";
+        if ($tag) {
+            $where .= " AND a_tag='{$tag}'";
         }
         $data = Article::count($where);
-        if ($data > $this -> pageSize && $data%$this -> pageSize === 0){
-            $data = floor($data/$this -> pageSize);
+        if ($data > $this->pageSize && $data % $this->pageSize === 0) {
+            $data = floor($data / $this->pageSize);
         } else {
-            $data = ceil($data/$this -> pageSize);
+            $data = ceil($data / $this->pageSize);
         }
-        return $this -> responseJson(10006, $data);
+        return $this->responseJson(10006, $data);
     }
 
-    public function getPageAction ()
+    public function getPageAction()
     {
-        $json = $this -> request -> getJsonRawBody(true);
+        $json = $this->request->getJsonRawBody(true);
         $page = $json['page'];
         $tag = $json['tag'];
-        $pageSize = $this -> pageSize;
+        $pageSize = $this->pageSize;
         $where = 'a_published=1';
-        if($tag){
-            $where .= "AND a_tag = {$tag}";
+        if ($tag) {
+            $where .= " AND a_tag = '{$tag}'";
         }
         $condtions = [
             'order' => 'a_id desc',
@@ -57,14 +59,14 @@ class ArticleController extends ControllerBase
             'limit' => $pageSize,
         ];
         $data = Article::find($condtions);
-        return $this -> responseJson(10007, $data);
+        return $this->responseJson(10007, $data);
     }
 
     public function getOneAction()
     {
-        $json = $this -> request -> getJsonRawBody(true);
-        if(empty($json) || empty($json['id'])){
-            return $this -> responseJson(10009, null);
+        $json = $this->request->getJsonRawBody(true);
+        if (empty($json) || empty($json['id'])) {
+            return $this->responseJson(10009, null);
         }
         $id = $json['id'];
         $data = Article::findFirst([
@@ -73,6 +75,46 @@ class ArticleController extends ControllerBase
                 'id' => $id,
             ],
         ]);
-        return $this -> responseJson(10010, $data);
+        return $this->responseJson(10010, $data);
     }
+
+    public function add_praise()
+    {
+        $json = $this->request->getJsonRawBody(true);
+        $web_res = WebData::setInc('total_praise', 1);
+        if (empty($json) || empty($json['id'])) {
+            return $this->responseJson(10014, $web_res, ['webdata ok', 'webdata fail']);
+        }
+        $id = $json['id'];
+        $article = Article::findFirst($id);
+        $article->a_praise += 1;
+        $_res = $article->save();
+        $msg = ['all ok'];
+        if ($web_res) {
+            if ($_res) {
+                $errcode = 10011;
+                $res = true;
+                $msg [] = 'all fail';
+            } else {
+                $errcode = 10011;
+                $res = null;
+                $msg [] = 'article fail, webdata ok';
+            }
+        } else {
+            if ($_res) {
+                $errcode = 10012;
+                $res = null;
+                $msg [] = 'article ok webdata fail';
+            } else {
+                $errcode = 10013;
+                $res = null;
+                $msg[] = 'all fail';
+            }
+        }
+        return $this->responseJson($errcode, $res, $msg);
+    }
+
+//    todo 时间轴
+    public function get_all_article()
+    {}
 }

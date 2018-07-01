@@ -20,6 +20,12 @@ class IndexController extends ControllerBase
             'getPage' => '/article/getPage',
             'getComment' => '/comment/getComment',
             'getOne' => '/article/getOne',
+            'add_praise' => '/article/add_praise',
+            'addComment' => '/comment/addComment',
+            'register' => '/login/register',
+            'check_login' => '/login/check_login',
+            'get_about' => '/config/get_about',
+            'get_all_article' => '/article/get_all_article'
         ]);
         return $this -> responseJson(10000, $data);
     }
